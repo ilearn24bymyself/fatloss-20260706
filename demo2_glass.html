@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo 2 - Glassmorphism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #312e81 50%, #831843 100%); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+    </style>
+</head>
+<body class="min-h-screen gradient-bg p-6">
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-10 left-10 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10 pt-4">
+        <h1 class="text-3xl font-bold text-white mb-8 text-center drop-shadow-md">風格二：Glassmorphism (玻璃擬態)</h1>
+        
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- 左欄：Glass 輸入區 -->
+            <aside class="w-full md:w-80 flex-shrink-0">
+                <div class="glass rounded-3xl p-6 sticky top-6 shadow-xl">
+                    <h2 class="text-xl font-bold mb-6 text-white">新增紀錄</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">日期</label>
+                            <input type="date" class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner" value="2026-07-06">
+                        </div>
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">體重 (kg)</label>
+                            <input type="number" class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner" placeholder="e.g. 75.2">
+                        </div>
+                        <button class="w-full bg-white/90 hover:bg-white text-purple-800 font-bold rounded-xl py-3 mt-4 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">儲存紀錄</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右欄：Glass Dashboard -->
+            <main class="flex-1">
+                <div class="mb-4 text-white/60 text-sm flex items-center gap-2 drop-shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    模擬情境：輸入滿 14 天後自動觸發的「雙週進度結算」
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- 體重卡片 (含雙週 Badge) -->
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-105 transition-transform cursor-pointer shadow-xl relative overflow-hidden">
+                        <!-- 雙週變化徽章 -->
+                        <div class="absolute top-4 right-4 bg-emerald-400/20 text-emerald-300 px-3 py-1.5 rounded-full border border-emerald-400/30 flex items-center gap-1 text-sm font-bold backdrop-blur-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                            1.5 kg
+                        </div>
+                        
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium drop-shadow-sm">目前體重</h4>
+                        <div class="text-6xl font-bold mb-4 drop-shadow-lg">73.5</div>
+                        <div class="text-sm text-white/50 drop-shadow-sm flex justify-center gap-4">
+                            <span>14天前: 75.0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-105 transition-transform cursor-pointer shadow-xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-pink-500/20 to-transparent"></div>
+                        <div class="absolute top-4 right-4 text-emerald-300 text-sm font-bold bg-emerald-400/20 px-2 py-1 rounded backdrop-blur-md border border-emerald-400/30">⬇ 1.2%</div>
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium relative z-10 drop-shadow-sm">體脂率</h4>
+                        <div class="text-5xl font-bold mb-4 text-pink-200 relative z-10 drop-shadow-lg">19.8<span class="text-2xl ml-1 opacity-70">%</span></div>
+                        <div class="text-sm text-white/50 relative z-10">14天前: 21.0%</div>
+                    </div>
+                    
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-105 transition-transform cursor-pointer shadow-xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-amber-500/20 to-transparent"></div>
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium relative z-10 drop-shadow-sm">內臟脂肪</h4>
+                        <div class="text-5xl font-bold mb-4 text-amber-200 relative z-10 drop-shadow-lg">7</div>
+                        <div class="text-sm text-white/50 relative z-10">14天前: 7</div>
+                    </div>
+                </div>
+                
+                <div class="glass rounded-3xl p-10 h-80 flex flex-col items-center justify-center text-white/80 shadow-xl relative">
+                    <h3 class="text-xl mb-4 font-bold drop-shadow-sm w-full text-left">長期趨勢分析</h3>
+                    <div class="w-full flex-1 border border-white/20 border-dashed rounded-xl flex items-center justify-center bg-white/5 relative overflow-hidden">
+                        <svg class="w-full h-full opacity-50 text-white" viewBox="0 0 100 50" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,40 20,38 40,30 60,32 80,20 100,10" />
+                        </svg>
+                        <span class="absolute drop-shadow-md">Chart.js 玻璃風格折線圖</span>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo 1 - Bento Grid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>* { font-family: 'Inter', sans-serif; } input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }</style>
+</head>
+<body class="bg-neutral-950 min-h-screen text-white p-6">
+    <h1 class="text-3xl font-bold mb-8 text-center">風格一：Bento Grid (便當盒網格)</h1>
+    
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
+        
+        <!-- 左欄：Bento 輸入區 -->
+        <aside class="w-full md:w-80 flex-shrink-0">
+            <div class="bg-neutral-900 rounded-3xl p-6 border border-neutral-800 sticky top-6">
+                <h2 class="text-xl font-bold mb-6 text-white">新增紀錄</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-neutral-400 font-medium ml-1">日期</label>
+                        <input type="date" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 mt-1 text-white focus:border-violet-500 focus:outline-none transition-colors" value="2026-07-06">
+                    </div>
+                    <div>
+                        <label class="text-sm text-neutral-400 font-medium ml-1">體重 (kg)</label>
+                        <input type="number" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 mt-1 text-white focus:border-violet-500 focus:outline-none transition-colors" placeholder="e.g. 75.2">
+                    </div>
+                    <button class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold rounded-xl py-3 mt-4 transition-colors">儲存紀錄</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右欄：Bento Dashboard -->
+        <main class="flex-1">
+            <div class="mb-4 text-neutral-400 text-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                模擬情境：輸入滿 14 天後自動觸發的「雙週進度結算」
+            </div>
+
+            <section class="grid grid-cols-1 lg:grid-cols-4 grid-rows-2 gap-4" style="height: 600px;">
+                <!-- 大圖表區 (左上到左下) -->
+                <div class="col-span-1 lg:col-span-2 row-span-2 bg-gradient-to-br from-neutral-900 to-neutral-800 rounded-3xl p-6 border border-neutral-800 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-white">體重與體脂趨勢</h3>
+                        <span class="text-xs text-neutral-500 bg-neutral-950 px-3 py-1 rounded-full border border-neutral-800">過去 14 天</span>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center text-neutral-500 bg-neutral-900/50 rounded-2xl border border-neutral-800 border-dashed relative overflow-hidden">
+                        <div class="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-violet-500/10 to-transparent"></div>
+                        <svg class="w-full h-full opacity-30 text-violet-500" viewBox="0 0 100 50" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,40 20,38 40,30 60,32 80,20 100,10" />
+                        </svg>
+                        <span class="absolute">Chart.js 動態折線圖</span>
+                    </div>
+                </div>
+                
+                <!-- 右上：目前體重與雙週對比 (重點強調) -->
+                <div class="col-span-1 lg:col-span-2 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-white/80 uppercase tracking-widest text-sm font-semibold flex items-center gap-2">
+                                目前體重
+                            </span>
+                            <div class="text-6xl font-bold mt-2 tracking-tight text-white">
+                                73.5 <span class="text-3xl text-white/60 font-medium">kg</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 雙週進步徽章 (Bento 特色) -->
+                        <div class="bg-emerald-400/20 text-emerald-300 px-5 py-3 rounded-2xl border border-emerald-400/30 flex flex-col items-end backdrop-blur-sm">
+                            <span class="text-xs uppercase tracking-widest opacity-80 mb-1">14天變化</span>
+                            <div class="flex items-center gap-1">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                                <span class="font-bold text-3xl">1.5</span>
+                                <span class="font-medium text-lg mt-1">kg</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex gap-4 text-sm text-white/70 bg-black/20 rounded-xl p-3 w-max backdrop-blur-sm">
+                        <span>14天前：75.0 kg</span>
+                    </div>
+                </div>
+                
+                <!-- 右下：兩個小方塊 (體脂 / 內臟脂肪) -->
+                <div class="bg-neutral-900 rounded-3xl p-6 border border-neutral-800 flex flex-col justify-center relative">
+                    <div class="absolute top-4 right-4 text-emerald-400 text-sm font-bold bg-emerald-400/10 px-2 py-1 rounded">⬇ 1.2%</div>
+                    <span class="text-sm text-neutral-400 mb-2 font-medium">體脂率</span>
+                    <div class="text-4xl font-bold text-pink-500">19.8 <span class="text-xl text-pink-500/60">%</span></div>
+                    <div class="text-xs text-neutral-500 mt-2">14天前：21.0%</div>
+                </div>
+                
+                <div class="bg-neutral-900 rounded-3xl p-6 border border-neutral-800 flex flex-col justify-center relative">
+                    <div class="absolute top-4 right-4 text-neutral-500 text-sm font-bold bg-neutral-800 px-2 py-1 rounded">➖ 持平</div>
+                    <span class="text-sm text-neutral-400 mb-2 font-medium">內臟脂肪</span>
+                    <div class="text-4xl font-bold text-amber-500">7</div>
+                    <div class="text-xs text-neutral-500 mt-2">14天前：7</div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

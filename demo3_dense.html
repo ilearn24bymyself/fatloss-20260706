@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo 3 - Data Dense Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen font-sans text-white p-6">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+            <h1 class="text-2xl font-bold">風格三：Data-Dense Dashboard (高密度數據儀表板)</h1>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                <span class="text-sm text-slate-400">雙週結算已觸發</span>
+            </div>
+        </div>
+
+        <div class="flex gap-6">
+            <!-- 左欄：密集表單 -->
+            <aside class="w-72 flex-shrink-0">
+                <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                    <h2 class="text-sm font-semibold mb-4 text-slate-300 uppercase tracking-widest border-b border-slate-700 pb-2">Entry Form</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400 font-mono">Date</label>
+                            <input type="date" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 focus:outline-none font-mono" value="2026-07-06" style="color-scheme: dark;">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 font-mono">Weight (kg)</label>
+                            <input type="number" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 mt-1 text-sm text-white focus:border-blue-500 focus:outline-none font-mono" placeholder="75.2">
+                        </div>
+                        <button class="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded py-2 mt-2 transition-colors">Submit Data</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右欄：KPI 矩陣 -->
+            <main class="flex-1">
+                <!-- Data Row -->
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                        <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Weight</p>
+                        <p class="text-3xl font-bold font-mono text-blue-400">73.5</p>
+                        <div class="mt-2 flex justify-between items-end">
+                            <p class="text-xs text-emerald-400 font-mono font-bold bg-emerald-400/10 px-1.5 py-0.5 rounded">▼ -1.5 (14d)</p>
+                            <p class="text-[10px] text-slate-500 font-mono">Prev: 75.0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1 bg-pink-500"></div>
+                        <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Body Fat</p>
+                        <p class="text-3xl font-bold font-mono text-pink-400">19.8<span class="text-sm">%</span></p>
+                        <div class="mt-2 flex justify-between items-end">
+                            <p class="text-xs text-emerald-400 font-mono font-bold bg-emerald-400/10 px-1.5 py-0.5 rounded">▼ -1.2 (14d)</p>
+                            <p class="text-[10px] text-slate-500 font-mono">Prev: 21.0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 bottom-0 w-1 bg-amber-500"></div>
+                        <p class="text-xs text-slate-400 mb-1 uppercase tracking-wider">Visceral Fat</p>
+                        <p class="text-3xl font-bold font-mono text-amber-400">7</p>
+                        <div class="mt-2 flex justify-between items-end">
+                            <p class="text-xs text-slate-400 font-mono font-bold bg-slate-700 px-1.5 py-0.5 rounded">- 0.0 (14d)</p>
+                            <p class="text-[10px] text-slate-500 font-mono">Prev: 7</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 flex flex-col justify-center items-center bg-slate-800/50">
+                        <p class="text-xs text-slate-400 uppercase tracking-wider mb-2">Metrics Validated</p>
+                        <div class="w-12 h-12 rounded-full border-4 border-emerald-500 flex items-center justify-center text-emerald-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Row -->
+                <div class="bg-slate-800 rounded-lg p-6 border border-slate-700 h-80 flex flex-col relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-semibold text-slate-300">Trend Analysis</h3>
+                        <div class="flex gap-1">
+                            <button class="px-2 py-1 text-[10px] font-mono bg-blue-600 rounded text-white">14D</button>
+                            <button class="px-2 py-1 text-[10px] font-mono bg-slate-700 rounded text-slate-300">1M</button>
+                            <button class="px-2 py-1 text-[10px] font-mono bg-slate-700 rounded text-slate-300">3M</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex items-center justify-center text-slate-600 border border-slate-700 border-dashed rounded relative overflow-hidden">
+                        <svg class="w-full h-full opacity-50 text-blue-500" viewBox="0 0 100 50" preserveAspectRatio="none">
+                            <polyline fill="none" stroke="currentColor" stroke-width="2" points="0,40 20,38 40,30 60,32 80,20 100,10" />
+                        </svg>
+                        <span class="absolute font-mono text-sm">Chart.js High-Density Render</span>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

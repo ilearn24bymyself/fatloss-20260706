@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>減脂追蹤紀錄 (Glassmorphism)</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind is injected via Vite and style.css -->
+    <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="min-h-screen gradient-bg p-4 md:p-6 custom-scrollbar text-white">
+    <!-- 漸層背景特效 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute top-10 left-10 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- 登入畫面 (Magic Link) -->
+    <div id="authGate" class="hidden relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="glass rounded-3xl p-8 shadow-xl w-full max-w-sm text-center">
+            <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">FatLoss Tracker</h1>
+            <p class="text-sm text-white/70 mb-6">輸入 Email，我們會寄一個登入連結給你</p>
+            <form id="loginForm" class="space-y-4">
+                <input type="email" id="loginEmail" required placeholder="you@example.com" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">寄送登入連結</button>
+            </form>
+            <p id="loginMessage" class="text-sm text-emerald-300 mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <div id="appRoot" class="hidden max-w-7xl mx-auto relative z-10 pt-4">
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center mb-8 border-b border-white/20 pb-4 drop-shadow-md">
+            <h1 class="text-3xl font-bold text-white tracking-tight">FatLoss Tracker</h1>
+            <div class="flex items-center gap-2">
+                <span id="userEmail" class="text-sm text-white/60 mr-2"></span>
+                <button id="exportBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-lg text-sm transition-colors border border-white/20 cursor-pointer shadow-lg font-medium">匯出 JSON</button>
+                <button id="btnImport" class="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-lg text-sm transition-colors border border-white/20 cursor-pointer shadow-lg font-medium">匯入 JSON</button>
+                <input type="file" id="fileImport" accept=".json" class="hidden" />
+                <button id="logoutBtn" class="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 backdrop-blur-md rounded-lg text-sm transition-colors border border-rose-400/30 cursor-pointer shadow-lg font-medium">登出</button>
+            </div>
+        </div>
+
+        <div class="flex flex-col xl:flex-row gap-6">
+            <!-- 左欄：Glass 輸入區 & 歷史明細 -->
+            <aside class="w-full xl:w-[350px] flex-shrink-0 flex flex-col gap-6">
+                <!-- 新增紀錄表單 -->
+                <div class="glass rounded-3xl p-6 shadow-xl">
+                    <h2 class="text-xl font-bold mb-6 text-white drop-shadow-sm">新增紀錄</h2>
+                    <form id="fatLossForm" class="space-y-4">
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">日期</label>
+                            <input type="date" id="date" required class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                        </div>
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">體重 (kg)</label>
+                            <input type="number" id="weight" step="0.1" required class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner" placeholder="e.g. 75.2">
+                        </div>
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">體脂率 (%)</label>
+                            <input type="number" id="bodyFat" step="0.1" required class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner" placeholder="e.g. 22.5">
+                        </div>
+                        <div>
+                            <label class="text-sm text-white/80 font-medium ml-1 drop-shadow-sm">內臟脂肪</label>
+                            <input type="number" id="visceralFat" step="1" required class="w-full glass rounded-xl px-4 py-3 mt-1 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner" placeholder="e.g. 8">
+                        </div>
+
+                        <!-- 週日專屬欄位 -->
+                        <div id="weeklyFields" class="hidden space-y-4 pt-4 border-t border-white/20">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span class="text-sm text-emerald-300 font-semibold drop-shadow-sm">週日進度結算</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm text-white/80 font-medium ml-1">胸圍</label>
+                                    <input type="number" id="chest" step="0.1" class="w-full glass rounded-xl px-3 py-2 mt-1 text-white focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-white/80 font-medium ml-1">上手臂</label>
+                                    <input type="number" id="arm" step="0.1" class="w-full glass rounded-xl px-3 py-2 mt-1 text-white focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-white/80 font-medium ml-1">腰圍</label>
+                                    <input type="number" id="waist" step="0.1" class="w-full glass rounded-xl px-3 py-2 mt-1 text-white focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-white/80 font-medium ml-1">臀圍</label>
+                                    <input type="number" id="hip" step="0.1" class="w-full glass rounded-xl px-3 py-2 mt-1 text-white focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="text-sm text-white/80 font-medium ml-1">大腿</label>
+                                    <input type="number" id="thigh" step="0.1" class="w-full glass rounded-xl px-3 py-2 mt-1 text-white focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 mt-4 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 cursor-pointer">儲存紀錄</button>
+                    </form>
+                </div>
+
+                <!-- 歷史明細表格 -->
+                <div class="glass rounded-3xl p-6 shadow-xl flex flex-col h-[350px]">
+                    <h3 class="text-xl font-bold mb-4 text-white drop-shadow-sm">歷史明細</h3>
+                    <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar relative">
+                        <table class="w-full text-sm text-left">
+                            <thead class="sticky top-0 bg-white/10 backdrop-blur-md z-10 text-white/80 rounded-t-xl">
+                                <tr>
+                                    <th class="pb-2 pt-2 px-2 font-medium border-b border-white/20">日期</th>
+                                    <th class="pb-2 pt-2 px-2 font-medium text-right border-b border-white/20">體重</th>
+                                    <th class="pb-2 pt-2 px-2 font-medium text-right border-b border-white/20">體脂</th>
+                                    <th class="pb-2 pt-2 px-2 font-medium text-center border-b border-white/20">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody" class="divide-y divide-white/10">
+                                <!-- Data injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 右欄：Glass Dashboard -->
+            <main class="flex-1 flex flex-col gap-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 目前體重卡片 -->
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-[1.02] transition-transform shadow-xl relative overflow-hidden">
+                        <!-- 雙週變化徽章 -->
+                        <div id="badge-weight" class="hidden absolute top-4 right-4 bg-emerald-400/20 text-emerald-300 px-3 py-1.5 rounded-full border border-emerald-400/30 flex items-center gap-1 text-sm font-bold backdrop-blur-md">
+                            <span id="badge-weight-arrow"></span>
+                            <span id="badge-weight-val">--</span>
+                        </div>
+                        
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium drop-shadow-sm">目前體重</h4>
+                        <div class="text-6xl font-bold mb-4 drop-shadow-lg flex justify-center items-baseline gap-2">
+                            <span id="bento-weight">--</span>
+                            <span class="text-2xl opacity-70">kg</span>
+                        </div>
+                        <div class="text-sm text-white/50 drop-shadow-sm flex justify-center gap-4">
+                            <span id="bento-date">最後紀錄：--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 體脂率卡片 -->
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-[1.02] transition-transform shadow-xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-pink-500/10 to-transparent pointer-events-none"></div>
+                        <div id="badge-bf" class="hidden absolute top-4 right-4 text-emerald-300 text-sm font-bold bg-emerald-400/20 border border-emerald-400/30 px-2 py-1 rounded backdrop-blur-md">--</div>
+                        
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium relative z-10 drop-shadow-sm">體脂率</h4>
+                        <div class="text-5xl font-bold mb-4 text-pink-200 relative z-10 drop-shadow-lg flex justify-center items-baseline gap-1">
+                            <span id="bento-bf">--</span>
+                            <span class="text-2xl opacity-70">%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 內臟脂肪卡片 -->
+                    <div class="glass rounded-3xl p-8 text-center text-white transform hover:scale-[1.02] transition-transform shadow-xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent pointer-events-none"></div>
+                        <div id="badge-vf" class="hidden absolute top-4 right-4 text-emerald-300 text-sm font-bold bg-emerald-400/20 border border-emerald-400/30 px-2 py-1 rounded backdrop-blur-md">--</div>
+                        
+                        <h4 class="text-white/70 text-sm uppercase mb-4 tracking-widest font-medium relative z-10 drop-shadow-sm">內臟脂肪</h4>
+                        <div class="text-5xl font-bold mb-4 text-amber-200 relative z-10 drop-shadow-lg">
+                            <span id="bento-vf">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 大圖表區 -->
+                <div class="glass rounded-3xl p-6 lg:p-10 flex-1 flex flex-col text-white/80 shadow-xl relative min-h-[400px]">
+                    <h3 class="text-xl mb-4 font-bold drop-shadow-sm w-full text-left text-white">長期趨勢分析</h3>
+                    <div class="w-full flex-1 rounded-xl flex items-center justify-center relative overflow-hidden">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <style>
+        /* 自訂捲軸 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+    </style>
+
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 主邏輯 -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
