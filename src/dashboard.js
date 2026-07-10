@@ -47,10 +47,10 @@ export function renderDashboard(records) {
     let sign, valStr = Math.abs(diff).toFixed(1);
     if (diff < 0) {
       sign = '-';
-      wrapper.classList.add('bg-rose-400/20','text-rose-300','border-rose-400/30');
+      wrapper.classList.add('bg-emerald-400/20','text-emerald-300','border-emerald-400/30');
     } else if (diff > 0) {
       sign = '+';
-      wrapper.classList.add('bg-emerald-400/20','text-emerald-300','border-emerald-400/30');
+      wrapper.classList.add('bg-rose-400/20','text-rose-300','border-rose-400/30');
     } else {
       sign = '';
       valStr = '0.0';
@@ -74,7 +74,7 @@ function deltaBadge(cur, old, unit) {
   if (isNaN(diff)) return '';
   const neutral = diff === 0, decreased = diff < 0;
   const sign = neutral ? '' : (decreased ? '-' : '+');
-  const color = neutral ? 'text-white/60' : (decreased ? 'text-rose-300' : 'text-emerald-300');
+  const color = neutral ? 'text-white/60' : (decreased ? 'text-emerald-300' : 'text-rose-300');
   return `<span class="${color} font-semibold">${sign}${Math.abs(diff).toFixed(1)}${unit}</span>`;
 }
 

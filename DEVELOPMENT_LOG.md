@@ -127,6 +127,12 @@
 - **Target Files**: `src/dashboard.js`
 - **Verification**: `npm run build` passed; visually confirmed via Playwright MCP against the dev server with real account data — bento badges, weekly total, and weekly list all show the new sign/color convention correctly.
 
+### [2026-07-11] 修正狀態色配色（減少=綠、增加=紅） (START/END)
+- **What**: Reverted the delta color mapping introduced in the previous commit. Kept the `+`/`-` sign convention but colored by *outcome* instead of raw arithmetic sign: decrease (the desired fat-loss direction) is emerald/green, increase is rose/red, across bento badges, weekly total, and weekly list.
+- **Why**: The prior red-for-decrease mapping made the panel mostly red on good days (since decreasing is the common, desired outcome), reading as alarming/messy. Consulted the `dataviz` skill's status-color guidance — status color must encode good/bad meaning with red reserved for genuinely bad outcomes, not follow numeric sign literally.
+- **Target Files**: `src/dashboard.js`
+- **Verification**: `npm run build` passed; visually confirmed via Playwright MCP against the dev server — panel is now mostly green with red appearing only on the one real regression (hip measurement) in the account's test data.
+
 ### [2026-07-11] Session 結束快照
 - **What**: All code changes complete and deployed. Supabase configured (2 users, public signup disabled). Walkthrough written. One task remaining: end-to-end test (deferred to VSCode session).
 - **Why**: User switching from Antigravity to VSCode. Saving state before handoff.
