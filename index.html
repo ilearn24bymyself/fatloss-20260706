@@ -9,14 +9,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind is injected via Vite and style.css -->
-  <script type="module" crossorigin src="/fatloss-20260706/assets/index-BTNbPvT9.js"></script>
-  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-VOz02zIe.css">
+  <script type="module" crossorigin src="/fatloss-20260706/assets/index-2SpTB3TI.js"></script>
+  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-84CYHBlH.css">
 </head>
 <body class="min-h-screen gradient-bg p-4 md:p-6 custom-scrollbar text-white">
     <!-- 漸層背景特效 -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div class="absolute top-10 left-10 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- 設定新密碼畫面（PASSWORD_RECOVERY flow） -->
+    <div id="passwordResetGate" class="hidden relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="glass rounded-3xl p-8 shadow-xl w-full max-w-sm text-center">
+            <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">設定新密碼</h1>
+            <p class="text-sm text-white/70 mb-6">請輸入並確認你的新密碼</p>
+            <form id="passwordResetForm" class="space-y-4">
+                <input type="password" id="newPassword" required minlength="6" placeholder="新密碼（至少 6 位）" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <input type="password" id="confirmPassword" required minlength="6" placeholder="確認新密碼" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">儲存密碼</button>
+            </form>
+            <p id="passwordResetMessage" class="text-sm text-rose-300 mt-4 hidden"></p>
+        </div>
     </div>
 
     <!-- 登入畫面 -->
