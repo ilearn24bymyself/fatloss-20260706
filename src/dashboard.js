@@ -3,26 +3,22 @@ export function renderDashboard(records) {
   const elBf = document.getElementById('bento-bf');
   const elVf = document.getElementById('bento-vf');
   const elDate = document.getElementById('bento-date');
-  
   const bWeight = document.getElementById('badge-weight');
   const bWeightArrow = document.getElementById('badge-weight-arrow');
   const bWeightVal = document.getElementById('badge-weight-val');
-  
   const bBf = document.getElementById('badge-bf');
   const bVf = document.getElementById('badge-vf');
 
-  if (!elWeight) return; // guard
+  if (!elWeight) return;
 
-  // Reset defaults
   elWeight.innerText = '--';
   elBf.innerText = '--';
   elVf.innerText = '--';
   elDate.innerText = '最後紀錄：--';
-  
   bWeight.classList.add('hidden');
   bBf.classList.add('hidden');
   bVf.classList.add('hidden');
-  
+
   if (!records || records.length === 0) return;
 
   const newest = records[0];
@@ -31,52 +27,35 @@ export function renderDashboard(records) {
   elVf.innerText = newest.visceralFat;
   elDate.innerText = `最後紀錄：${newest.date}`;
 
-  // Delta calculation only applies on Sundays
-  const dNew = new Date(newest.date);
-  if (dNew.getDay() !== 0) return;
+  // Compare latest Sunday vs previous Sunday
+  const sundays = records.filter(r => new Date(r.date).getDay() === 0);
+  if (sundays.length < 2) return;
 
-  const targetTime = dNew.getTime() - 14 * 24 * 60 * 60 * 1000;
-  let bestOldRecord = null;
-  let minDiff = Infinity;
-  for(let i=1; i<records.length; i++) {
-     const t = new Date(records[i].date).getTime();
-     const diffDays = Math.abs((t - targetTime) / (1000 * 3600 * 24));
-     if(diffDays <= 3 && diffDays < minDiff) {
-       minDiff = diffDays;
-       bestOldRecord = records[i];
-     }
-  }
+  const cur = sundays[0];
+  const prev = sundays[1];
 
-  if (!bestOldRecord) return;
-
-  // Calculate Deltas
   const updateBadge = (wrapper, arrowEl, valEl, vNew, vOld, isBfVf) => {
     const diff = parseFloat(vNew) - parseFloat(vOld);
     if (isNaN(diff)) return;
-    
     wrapper.classList.remove('hidden');
-    // For flex items, ensure flex is restored.
-    if (!isBfVf) {
-        wrapper.classList.add('flex');
-    }
-
-    let arrow = '➖';
-    let valStr = Math.abs(diff).toFixed(1);
-    
-    wrapper.classList.remove('bg-emerald-400/20', 'text-emerald-300', 'border-emerald-400/30', 'bg-rose-400/20', 'text-rose-300', 'border-rose-400/30', 'bg-neutral-400/20', 'text-neutral-300', 'border-neutral-400/30');
-
+    if (!isBfVf) wrapper.classList.add('flex');
+    wrapper.classList.remove(
+      'bg-emerald-400/20','text-emerald-300','border-emerald-400/30',
+      'bg-rose-400/20','text-rose-300','border-rose-400/30',
+      'bg-neutral-400/20','text-neutral-300','border-neutral-400/30'
+    );
+    let arrow, valStr = Math.abs(diff).toFixed(1);
     if (diff < 0) {
       arrow = '⬇';
-      wrapper.classList.add('bg-emerald-400/20', 'text-emerald-300', 'border-emerald-400/30');
+      wrapper.classList.add('bg-emerald-400/20','text-emerald-300','border-emerald-400/30');
     } else if (diff > 0) {
       arrow = '⬆';
-      wrapper.classList.add('bg-rose-400/20', 'text-rose-300', 'border-rose-400/30');
+      wrapper.classList.add('bg-rose-400/20','text-rose-300','border-rose-400/30');
     } else {
       arrow = '➖';
-      wrapper.classList.add('bg-neutral-400/20', 'text-neutral-300', 'border-neutral-400/30');
       valStr = '0.0';
+      wrapper.classList.add('bg-neutral-400/20','text-neutral-300','border-neutral-400/30');
     }
-
     if (isBfVf) {
       wrapper.innerText = `${arrow} ${valStr}`;
     } else {
@@ -85,7 +64,62 @@ export function renderDashboard(records) {
     }
   };
 
-  updateBadge(bWeight, bWeightArrow, bWeightVal, newest.weight, bestOldRecord.weight, false);
-  updateBadge(bBf, null, null, newest.bodyFat, bestOldRecord.bodyFat, true);
-  updateBadge(bVf, null, null, newest.visceralFat, bestOldRecord.visceralFat, true);
+  updateBadge(bWeight, bWeightArrow, bWeightVal, cur.weight, prev.weight, false);
+  updateBadge(bBf, null, null, cur.bodyFat, prev.bodyFat, true);
+  updateBadge(bVf, null, null, cur.visceralFat, prev.visceralFat, true);
+}
+
+function deltaBadge(cur, old, unit) {
+  const diff = parseFloat(cur) - parseFloat(old);
+  if (isNaN(diff)) return '';
+  const neutral = diff === 0, good = diff < 0;
+  const arrow = neutral ? '➖' : (good ? '⬇' : '⬆');
+  const color = neutral ? 'text-white/60' : (good ? 'text-emerald-300' : 'text-rose-300');
+  return `<span class="${color} font-semibold">${arrow}${Math.abs(diff).toFixed(1)}${unit}</span>`;
+}
+
+export function renderWeeklyProgress(records) {
+  const panel = document.getElementById('weeklyProgressPanel');
+  const totalEl = document.getElementById('weeklyProgressTotal');
+  const listEl = document.getElementById('weeklyProgressList');
+  if (!panel) return;
+
+  const sundaysAsc = records
+    .filter(r => new Date(r.date).getDay() === 0)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  if (sundaysAsc.length < 2) {
+    panel.classList.add('hidden');
+    return;
+  }
+  panel.classList.remove('hidden');
+
+  const baseline = sundaysAsc[0];
+  const latest = sundaysAsc[sundaysAsc.length - 1];
+
+  totalEl.innerHTML = `
+    <p class="text-xs text-white/40 px-1 mb-2">🏁 總計（${baseline.date} → ${latest.date}）</p>
+    <div class="glass rounded-2xl p-4 flex flex-wrap gap-x-6 gap-y-1 justify-center text-sm">
+      <span>體重 ${deltaBadge(latest.weight, baseline.weight, 'kg')}</span>
+      <span>體脂 ${deltaBadge(latest.bodyFat, baseline.bodyFat, '%')}</span>
+      <span>內臟脂肪 ${deltaBadge(latest.visceralFat, baseline.visceralFat, '')}</span>
+      ${latest.waist && baseline.waist ? `<span>腰圍 ${deltaBadge(latest.waist, baseline.waist, 'cm')}</span>` : ''}
+      ${latest.hip && baseline.hip ? `<span>臀圍 ${deltaBadge(latest.hip, baseline.hip, 'cm')}</span>` : ''}
+      ${latest.thigh && baseline.thigh ? `<span>大腿 ${deltaBadge(latest.thigh, baseline.thigh, 'cm')}</span>` : ''}
+    </div>`;
+
+  const rows = [];
+  for (let i = sundaysAsc.length - 1; i > 0; i--) {
+    const cur = sundaysAsc[i];
+    const prev = sundaysAsc[i - 1];
+    rows.push(`
+      <div class="flex items-center justify-between bg-white/5 rounded-xl px-4 py-2 text-sm">
+        <span class="text-white/50">${prev.date} → ${cur.date}</span>
+        <span class="flex gap-3">
+          ${deltaBadge(cur.weight, prev.weight, 'kg')}
+          ${deltaBadge(cur.bodyFat, prev.bodyFat, '%')}
+        </span>
+      </div>`);
+  }
+  listEl.innerHTML = rows.join('');
 }

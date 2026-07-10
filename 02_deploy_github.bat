@@ -5,7 +5,7 @@ echo =========================================
 echo GitHub Pages Deployment Script (002 Cloud)
 echo =========================================
 echo.
-set GITHUB_USER=coolchife
+set GITHUB_USER=ilearn24bymyself
 
 echo.
 echo [1/4] Initializing Git repository...

@@ -18,16 +18,31 @@
         <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- 登入畫面 (Magic Link) -->
+    <!-- 設定新密碼畫面（PASSWORD_RECOVERY flow） -->
+    <div id="passwordResetGate" class="hidden relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="glass rounded-3xl p-8 shadow-xl w-full max-w-sm text-center">
+            <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">設定新密碼</h1>
+            <p class="text-sm text-white/70 mb-6">請輸入並確認你的新密碼</p>
+            <form id="passwordResetForm" class="space-y-4">
+                <input type="password" id="newPassword" required minlength="6" placeholder="新密碼（至少 6 位）" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <input type="password" id="confirmPassword" required minlength="6" placeholder="確認新密碼" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">儲存密碼</button>
+            </form>
+            <p id="passwordResetMessage" class="text-sm text-rose-300 mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <!-- 登入畫面 -->
     <div id="authGate" class="hidden relative z-10 min-h-screen flex items-center justify-center p-4">
         <div class="glass rounded-3xl p-8 shadow-xl w-full max-w-sm text-center">
             <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">FatLoss Tracker</h1>
-            <p class="text-sm text-white/70 mb-6">輸入 Email，我們會寄一個登入連結給你</p>
+            <p class="text-sm text-white/70 mb-6">輸入帳號與密碼登入</p>
             <form id="loginForm" class="space-y-4">
-                <input type="email" id="loginEmail" required placeholder="you@example.com" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
-                <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">寄送登入連結</button>
+                <input type="email" id="loginEmail" required placeholder="Email" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <input type="password" id="loginPassword" required placeholder="密碼" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
+                <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">登入</button>
             </form>
-            <p id="loginMessage" class="text-sm text-emerald-300 mt-4 hidden"></p>
+            <p id="loginMessage" class="text-sm text-rose-300 mt-4 hidden"></p>
         </div>
     </div>
 
@@ -168,7 +183,16 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- 週進度面板 -->
+                <div id="weeklyProgressPanel" class="hidden glass rounded-3xl p-6 lg:p-8 text-white shadow-xl">
+                    <div id="weeklyProgressTotal" class="mb-4"></div>
+                    <div>
+                        <p class="text-xs text-white/40 px-1 mb-2">📅 每週小計</p>
+                        <div id="weeklyProgressList" class="space-y-1.5 max-h-64 overflow-y-auto custom-scrollbar pr-1"></div>
+                    </div>
+                </div>
+
                 <!-- 大圖表區 -->
                 <div class="glass rounded-3xl p-6 lg:p-10 flex-1 flex flex-col text-white/80 shadow-xl relative min-h-[400px]">
                     <h3 class="text-xl mb-4 font-bold drop-shadow-sm w-full text-left text-white">長期趨勢分析</h3>
@@ -187,6 +211,18 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
     </style>
+
+    <!-- 週日結算 Modal -->
+    <div id="sundayModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div class="glass rounded-3xl p-8 shadow-2xl w-full max-w-md relative z-10">
+        <div id="sundayModalIcon" class="text-5xl text-center mb-3"></div>
+        <h3 id="sundayModalTitle" class="text-2xl font-bold text-white mb-1 text-center"></h3>
+        <p id="sundayModalSubtitle" class="text-sm text-white/60 text-center mb-6"></p>
+        <div id="sundayModalContent" class="space-y-2 mb-6"></div>
+        <button id="sundayModalClose" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all cursor-pointer">繼續前進 💪</button>
+      </div>
+    </div>
 
     <!-- 引入 Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

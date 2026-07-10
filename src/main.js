@@ -1,8 +1,8 @@
 import './style.css';
 import { Chart, registerables } from 'chart.js';
 import { getRecords, saveRecord, deleteRecord, exportData, importData } from './storage.js';
-import { renderDashboard } from './dashboard.js';
-import { getSession, onAuthStateChange, sendMagicLink, signOut } from './auth.js';
+import { renderDashboard, renderWeeklyProgress } from './dashboard.js';
+import { getSession, onAuthStateChange, signIn, signOut, updatePassword } from './auth.js';
 
 Chart.register(...registerables);
 
@@ -25,6 +25,20 @@ const btnImport = document.getElementById('btnImport');
 const fileImport = document.getElementById('fileImport');
 
 let trendChartInstance = null;
+
+// ── Modal helpers ──────────────────────────────────────────────
+function showSundayModal(record, allRecords) {
+  const sundays = allRecords.filter(r => new Date(r.date).getDay() === 0);
+  const isFirst = sundays.length === 1;
+
+  document.getElementById('sundayModalIcon').textContent = isFirst ? '🏁' : '✅';
+  document.getElementById('sundayModalTitle').textContent = isFirst ? '起點已建立！' : '本週三圍已記錄';
+  document.getElementById('sundayModalSubtitle').textContent = isFirst
+    ? '你的減脂旅程從今天開始，詳細進度可在下方「週進度」面板查看'
+    : '詳細比較請看下方「週進度」面板';
+  document.getElementById('sundayModalContent').innerHTML = '';
+  document.getElementById('sundayModal').classList.remove('hidden');
+}
 
 // Initialize
 async function init() {
@@ -68,16 +82,62 @@ async function init() {
     e.target.value = ''; // reset
   });
 
+  // Modal close buttons
+  document.getElementById('sundayModalClose').addEventListener('click', () => {
+    document.getElementById('sundayModal').classList.add('hidden');
+  });
+
   // Auth
   loginForm.addEventListener('submit', handleLoginSubmit);
   logoutBtn.addEventListener('click', handleLogout);
+  document.getElementById('passwordResetForm').addEventListener('submit', handlePasswordResetSubmit);
 
   const session = await getSession();
   showForSession(session);
 
-  onAuthStateChange((session) => {
-    showForSession(session);
+  onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      showPasswordResetGate();
+    } else {
+      showForSession(session);
+    }
   });
+}
+
+function showPasswordResetGate() {
+  document.getElementById('passwordResetGate').classList.remove('hidden');
+  authGate.classList.add('hidden');
+  appRoot.classList.add('hidden');
+}
+
+async function handlePasswordResetSubmit(e) {
+  e.preventDefault();
+  const newPw = document.getElementById('newPassword').value;
+  const confirmPw = document.getElementById('confirmPassword').value;
+  const msg = document.getElementById('passwordResetMessage');
+
+  if (newPw !== confirmPw) {
+    msg.textContent = '兩次密碼不一致';
+    msg.classList.remove('hidden');
+    return;
+  }
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  msg.classList.add('hidden');
+
+  try {
+    await updatePassword(newPw);
+    document.getElementById('passwordResetGate').classList.add('hidden');
+    msg.textContent = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+  } catch (err) {
+    msg.textContent = `更新失敗：${err.message}`;
+    msg.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function showForSession(session) {
@@ -95,18 +155,17 @@ function showForSession(session) {
 async function handleLoginSubmit(e) {
   e.preventDefault();
   const email = loginEmail.value.trim();
-  if (!email) return;
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) return;
 
   const submitBtn = loginForm.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
   loginMessage.classList.add('hidden');
 
   try {
-    await sendMagicLink(email);
-    loginMessage.textContent = `登入連結已寄到 ${email}，請去信箱點擊連結。`;
-    loginMessage.classList.remove('hidden');
+    await signIn(email, password);
   } catch (err) {
-    loginMessage.textContent = `寄送失敗：${err.message}`;
+    loginMessage.textContent = `登入失敗：${err.message}`;
     loginMessage.classList.remove('hidden');
   } finally {
     submitBtn.disabled = false;
@@ -179,7 +238,13 @@ async function handleFormSubmit(e) {
   handleDateChange();
   await refreshUI();
 
-  // Refocus the date input
+  // Sunday gets a short confirmation; weekdays save silently
+  const isSunday = new Date(record.date).getDay() === 0;
+  if (isSunday) {
+    const allRecords = await getRecords();
+    showSundayModal(record, allRecords);
+  }
+
   dateInput.focus();
 }
 
@@ -195,6 +260,7 @@ async function refreshUI() {
   renderTable(records);
   renderChart(records);
   renderDashboard(records);
+  renderWeeklyProgress(records);
 }
 
 function renderTable(records) {
