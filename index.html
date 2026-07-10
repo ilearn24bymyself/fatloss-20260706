@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind is injected via Vite and style.css -->
-  <script type="module" crossorigin src="/fatloss-20260706/assets/index-BcZPYam8.js"></script>
-  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-CfPypdh8.css">
+  <script type="module" crossorigin src="/fatloss-20260706/assets/index-BxFxx1g6.js"></script>
+  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-DCBaVigw.css">
 </head>
 <body class="min-h-screen gradient-bg p-4 md:p-6 custom-scrollbar text-white">
     <!-- 漸層背景特效 -->
@@ -188,6 +188,43 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
     </style>
+
+    <!-- 儲存確認 Modal (平日) -->
+    <div id="saveModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div class="glass rounded-3xl p-8 shadow-2xl w-full max-w-sm relative z-10 text-center">
+        <div class="text-5xl mb-3">✅</div>
+        <h3 class="text-xl font-bold text-white mb-1">記錄已儲存！</h3>
+        <p id="saveModalMeta" class="text-sm text-white/60 mb-6"></p>
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="glass rounded-2xl p-3">
+            <div class="text-xs text-white/60 mb-1">體重</div>
+            <div id="saveModalWeight" class="text-lg font-bold text-white"></div>
+          </div>
+          <div class="glass rounded-2xl p-3">
+            <div class="text-xs text-white/60 mb-1">體脂</div>
+            <div id="saveModalBf" class="text-lg font-bold text-pink-300"></div>
+          </div>
+          <div class="glass rounded-2xl p-3">
+            <div class="text-xs text-white/60 mb-1">內臟脂肪</div>
+            <div id="saveModalVf" class="text-lg font-bold text-amber-300"></div>
+          </div>
+        </div>
+        <button id="saveModalClose" class="w-full bg-white/20 hover:bg-white/30 text-white font-bold rounded-xl py-2.5 transition-all cursor-pointer">確認</button>
+      </div>
+    </div>
+
+    <!-- 週日結算 Modal -->
+    <div id="sundayModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      <div class="glass rounded-3xl p-8 shadow-2xl w-full max-w-md relative z-10">
+        <div id="sundayModalIcon" class="text-5xl text-center mb-3"></div>
+        <h3 id="sundayModalTitle" class="text-2xl font-bold text-white mb-1 text-center"></h3>
+        <p id="sundayModalSubtitle" class="text-sm text-white/60 text-center mb-6"></p>
+        <div id="sundayModalContent" class="space-y-2 mb-6"></div>
+        <button id="sundayModalClose" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all cursor-pointer">繼續前進 💪</button>
+      </div>
+    </div>
 
     <!-- 引入 Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
