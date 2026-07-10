@@ -2,7 +2,7 @@ import './style.css';
 import { Chart, registerables } from 'chart.js';
 import { getRecords, saveRecord, deleteRecord, exportData, importData } from './storage.js';
 import { renderDashboard, renderWeeklyProgress } from './dashboard.js';
-import { getSession, onAuthStateChange, signIn, signOut, updatePassword } from './auth.js';
+import { getSession, onAuthStateChange, signIn, signOut, updatePassword, sendPasswordReset } from './auth.js';
 
 Chart.register(...registerables);
 
@@ -91,12 +91,20 @@ async function init() {
   loginForm.addEventListener('submit', handleLoginSubmit);
   logoutBtn.addEventListener('click', handleLogout);
   document.getElementById('passwordResetForm').addEventListener('submit', handlePasswordResetSubmit);
+  document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
 
   const session = await getSession();
   showForSession(session);
 
   onAuthStateChange((event, session) => {
-    if (event === 'PASSWORD_RECOVERY') {
+    // 'INITIAL_SESSION' always fires first (session restored from storage), before
+    // the invite link's own token exchange resolves — don't consume the flag there.
+    let isInviteSignIn = false;
+    if (event === 'SIGNED_IN') {
+      isInviteSignIn = window.__authRedirectType === 'invite';
+      window.__authRedirectType = null; // consume once so later normal sign-ins aren't affected
+    }
+    if (event === 'PASSWORD_RECOVERY' || isInviteSignIn) {
       showPasswordResetGate();
     } else {
       showForSession(session);
@@ -169,6 +177,27 @@ async function handleLoginSubmit(e) {
     loginMessage.classList.remove('hidden');
   } finally {
     submitBtn.disabled = false;
+  }
+}
+
+async function handleForgotPassword() {
+  const email = loginEmail.value.trim();
+  if (!email) {
+    loginMessage.textContent = '請先在上方輸入 Email，再點忘記密碼';
+    loginMessage.classList.remove('hidden');
+    return;
+  }
+
+  loginMessage.classList.add('hidden');
+  try {
+    await sendPasswordReset(email);
+    loginMessage.textContent = '重設密碼信已寄出，請檢查信箱';
+    loginMessage.classList.remove('hidden', 'text-rose-300');
+    loginMessage.classList.add('text-emerald-300');
+  } catch (err) {
+    loginMessage.textContent = `寄送失敗：${err.message}`;
+    loginMessage.classList.remove('hidden', 'text-emerald-300');
+    loginMessage.classList.add('text-rose-300');
   }
 }
 

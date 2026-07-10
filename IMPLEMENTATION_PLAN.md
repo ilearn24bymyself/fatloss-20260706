@@ -1,5 +1,19 @@
 # 001_減脂追蹤紀錄 系統設計與開發計畫
 
+## [2026-07-11 18:00] 計畫更新：補上忘記密碼入口 + 修正邀請信流程
+
+診斷結果與完整討論見 `walkthroughs/20260711_1800_password_flow_spec.md`。
+
+### 已確認決策
+- **忘記密碼**：登入畫面從未有過觸發入口，`resetPasswordForEmail()` 全專案零呼叫——現在補上「忘記密碼？」連結，沿用既有的設定新密碼畫面
+- **邀請信**：Supabase SDK 對 `type=invite` 的連結只會發 `SIGNED_IN`（跟一般登入同一個事件），不會像 `type=recovery` 一樣發 `PASSWORD_RECOVERY`（原始碼位置：`GoTrueClient.js:2018`）。修法是在 `index.html` 用行內 script 搶在 SDK 清空 URL hash 前讀出 `type=invite`，`main.js` 判斷後導向設定密碼畫面
+- 專案 Supabase client 使用預設 `flowType: 'implicit'`（hash-based 連結格式），確認過沒有覆寫成 PKCE
+
+### 影響檔案
+- `index.html`、`src/auth.js`、`src/main.js`
+
+---
+
 ## [2026-07-11] 計畫更新：移除每日確認 Modal + 新增常駐週進度面板
 
 使用者發現「週日結算 Modal」裡的比較資料離開 Modal 就看不到了，不符合「持續呈現進度」的需求；同時每日儲存跳出的確認卡也顯得多餘。討論後確認以下決策：

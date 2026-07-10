@@ -133,7 +133,12 @@
 - **Target Files**: `src/dashboard.js`
 - **Verification**: `npm run build` passed; visually confirmed via Playwright MCP against the dev server — panel is now mostly green with red appearing only on the one real regression (hip measurement) in the account's test data.
 
-### [2026-07-11] Session 結束快照
+### [2026-07-11] 補上忘記密碼入口 + 修正邀請信流程 (START/END)
+- **What**: Added a "忘記密碼？" link to `#authGate` that calls a new `sendPasswordReset(email)` (wraps `resetPasswordForEmail`) — previously the password-reset landing page existed but nothing in the UI ever triggered the reset email. Fixed the invite flow: Supabase's `type=invite` links fire `SIGNED_IN` (confirmed via SDK source, `GoTrueClient.js:2018`), not `PASSWORD_RECOVERY` like `type=recovery` links do — added an inline pre-module `<script>` in `index.html` to capture `type` from the URL hash before the Supabase client (loaded async as a module) reads and clears it, then route `SIGNED_IN` + captured `type=invite` to the same password-set gate as recovery.
+- **Why**: User tested inviting a new account via Supabase's "Invite" feature — the invite link signed the user straight into the app with no password ever set, leaving them unable to log back in later. Also found there was no "forgot password" entry point on the login screen at all.
+- **Target Files**: `index.html`, `src/auth.js`, `src/main.js`
+- **Bug found & fixed during testing**: Initial implementation cleared the captured invite flag on *every* `onAuthStateChange` event, but `INITIAL_SESSION` always fires first (before the invite link's own token exchange resolves) — consuming the flag before it was ever used. Fixed to only consume it on `SIGNED_IN`.
+- **Verification**: `npm run build` passed. Via Playwright MCP against the dev server: forgot-password send path fully tested end-to-end (real reset email sent to the account, arrival not independently confirmed by the agent). Invite-flow hash-capture verified directly (survives past `INITIAL_SESSION`, no longer nulled prematurely). The final real-world leg (clicking an actual invite email link end-to-end) could not be tested by the agent (no email access, no real credentials) — requires deployment first since Supabase's configured Redirect URL points at the live site, not localhost. Deploying now specifically to unblock that final manual test.
 - **What**: All code changes complete and deployed. Supabase configured (2 users, public signup disabled). Walkthrough written. One task remaining: end-to-end test (deferred to VSCode session).
 - **Why**: User switching from Antigravity to VSCode. Saving state before handoff.
 - **Target Files**: `walkthroughs/20260710_session_log.md`, `task.md`

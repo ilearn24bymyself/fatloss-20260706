@@ -23,6 +23,12 @@ export async function signIn(email, password) {
   if (error) throw error;
 }
 
+export async function sendPasswordReset(email) {
+  const redirectTo = window.location.origin + window.location.pathname;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
