@@ -103,6 +103,8 @@ export function renderWeeklyProgress(records) {
       <span>體重 ${deltaBadge(latest.weight, baseline.weight, 'kg')}</span>
       <span>體脂 ${deltaBadge(latest.bodyFat, baseline.bodyFat, '%')}</span>
       <span>內臟脂肪 ${deltaBadge(latest.visceralFat, baseline.visceralFat, '')}</span>
+      ${latest.chest && baseline.chest ? `<span>胸圍 ${deltaBadge(latest.chest, baseline.chest, 'cm')}</span>` : ''}
+      ${latest.arm && baseline.arm ? `<span>上手臂 ${deltaBadge(latest.arm, baseline.arm, 'cm')}</span>` : ''}
       ${latest.waist && baseline.waist ? `<span>腰圍 ${deltaBadge(latest.waist, baseline.waist, 'cm')}</span>` : ''}
       ${latest.hip && baseline.hip ? `<span>臀圍 ${deltaBadge(latest.hip, baseline.hip, 'cm')}</span>` : ''}
       ${latest.thigh && baseline.thigh ? `<span>大腿 ${deltaBadge(latest.thigh, baseline.thigh, 'cm')}</span>` : ''}

@@ -115,6 +115,12 @@
 - **Target Files**: `index.html`, `src/main.js`, `src/dashboard.js`
 - **Verification**: `npm run build` succeeded. Follow-up: Playwright MCP was installed and used to drive the dev server end-to-end (user logged in manually, browser was headed). Confirmed: weekday save is silent (no modal), Sunday save shows the simplified one-line confirmation, the persistent `#weeklyProgressPanel` updates live with correct total (baseline→latest Sunday) and full per-week history, Chart.js renders correctly (an initial blank screenshot was just an animation-timing race, not a bug), logout returns to the login gate. Two test records (2026-07-10, 2026-07-12) were written to the live Supabase DB during this test — pending user decision on cleanup.
 
+### [2026-07-11] 修正週進度總計缺少胸圍/上手臂 (START/END)
+- **What**: `renderWeeklyProgress()`'s total section only compared 3 of the 5 body-measurement fields (waist/hip/thigh) inherited from the old Sunday modal's `buildMetrics()`, which never included chest/arm either. Added `胸圍`/`上手臂` delta badges alongside the existing waist/hip/thigh in the `🏁 總計` block.
+- **Why**: User noticed the total block wasn't showing all 5 tracked body dimensions while reviewing a 100-record local visual test (front-end-only mock data via a temporary `localStorage` hook in `storage.js`, reverted afterward — no writes to Supabase).
+- **Target Files**: `src/dashboard.js`
+- **Verification**: `npm run build` passed; re-tested visually with the same temporary mock-data hook (this time including chest/arm) via Playwright MCP — total block now shows all 8 metrics. Hook reverted from `storage.js` before commit.
+
 ### [2026-07-11] Session 結束快照
 - **What**: All code changes complete and deployed. Supabase configured (2 users, public signup disabled). Walkthrough written. One task remaining: end-to-end test (deferred to VSCode session).
 - **Why**: User switching from Antigravity to VSCode. Saving state before handoff.
