@@ -121,6 +121,12 @@
 - **Target Files**: `src/dashboard.js`
 - **Verification**: `npm run build` passed; re-tested visually with the same temporary mock-data hook (this time including chest/arm) via Playwright MCP — total block now shows all 8 metrics. Hook reverted from `storage.js` before commit.
 
+### [2026-07-11] 週進度總計改兩行版面 + 箭頭改為正負號 (START/END)
+- **What**: `renderWeeklyProgress()`'s total block now renders as two rows (core metrics: weight/bodyFat/visceralFat; body measurements: chest/arm/waist/hip/thigh below a divider) instead of one wrapping flex row. Replaced the ⬇/⬆/➖ arrow glyphs across `deltaBadge()` (total + weekly list) and `updateBadge()` (bento card corner badges) with `-`/`+`/`` signs; swapped the color mapping so decreases render red (`rose`) and increases render green (`emerald`) — an accounting-style convention (red = deficit) rather than the previous fat-loss-goodness color scheme.
+- **Why**: User found the down-arrow-means-good color scheme counter-intuitive and asked for a red "-" / green "+" numeric convention instead; also asked for the total block to visually separate the 3 core metrics from the 5 body-measurement dimensions instead of wrapping together.
+- **Target Files**: `src/dashboard.js`
+- **Verification**: `npm run build` passed; visually confirmed via Playwright MCP against the dev server with real account data — bento badges, weekly total, and weekly list all show the new sign/color convention correctly.
+
 ### [2026-07-11] Session 結束快照
 - **What**: All code changes complete and deployed. Supabase configured (2 users, public signup disabled). Walkthrough written. One task remaining: end-to-end test (deferred to VSCode session).
 - **Why**: User switching from Antigravity to VSCode. Saving state before handoff.

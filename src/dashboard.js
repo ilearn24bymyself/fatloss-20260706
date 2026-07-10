@@ -44,22 +44,22 @@ export function renderDashboard(records) {
       'bg-rose-400/20','text-rose-300','border-rose-400/30',
       'bg-neutral-400/20','text-neutral-300','border-neutral-400/30'
     );
-    let arrow, valStr = Math.abs(diff).toFixed(1);
+    let sign, valStr = Math.abs(diff).toFixed(1);
     if (diff < 0) {
-      arrow = '⬇';
-      wrapper.classList.add('bg-emerald-400/20','text-emerald-300','border-emerald-400/30');
-    } else if (diff > 0) {
-      arrow = '⬆';
+      sign = '-';
       wrapper.classList.add('bg-rose-400/20','text-rose-300','border-rose-400/30');
+    } else if (diff > 0) {
+      sign = '+';
+      wrapper.classList.add('bg-emerald-400/20','text-emerald-300','border-emerald-400/30');
     } else {
-      arrow = '➖';
+      sign = '';
       valStr = '0.0';
       wrapper.classList.add('bg-neutral-400/20','text-neutral-300','border-neutral-400/30');
     }
     if (isBfVf) {
-      wrapper.innerText = `${arrow} ${valStr}`;
+      wrapper.innerText = `${sign}${valStr}`;
     } else {
-      arrowEl.innerText = arrow;
+      arrowEl.innerText = sign;
       valEl.innerText = valStr;
     }
   };
@@ -72,10 +72,10 @@ export function renderDashboard(records) {
 function deltaBadge(cur, old, unit) {
   const diff = parseFloat(cur) - parseFloat(old);
   if (isNaN(diff)) return '';
-  const neutral = diff === 0, good = diff < 0;
-  const arrow = neutral ? '➖' : (good ? '⬇' : '⬆');
-  const color = neutral ? 'text-white/60' : (good ? 'text-emerald-300' : 'text-rose-300');
-  return `<span class="${color} font-semibold">${arrow}${Math.abs(diff).toFixed(1)}${unit}</span>`;
+  const neutral = diff === 0, decreased = diff < 0;
+  const sign = neutral ? '' : (decreased ? '-' : '+');
+  const color = neutral ? 'text-white/60' : (decreased ? 'text-rose-300' : 'text-emerald-300');
+  return `<span class="${color} font-semibold">${sign}${Math.abs(diff).toFixed(1)}${unit}</span>`;
 }
 
 export function renderWeeklyProgress(records) {
@@ -97,17 +97,23 @@ export function renderWeeklyProgress(records) {
   const baseline = sundaysAsc[0];
   const latest = sundaysAsc[sundaysAsc.length - 1];
 
+  const measurementSpans = [
+    latest.chest && baseline.chest ? `<span>胸圍 ${deltaBadge(latest.chest, baseline.chest, 'cm')}</span>` : '',
+    latest.arm && baseline.arm ? `<span>上手臂 ${deltaBadge(latest.arm, baseline.arm, 'cm')}</span>` : '',
+    latest.waist && baseline.waist ? `<span>腰圍 ${deltaBadge(latest.waist, baseline.waist, 'cm')}</span>` : '',
+    latest.hip && baseline.hip ? `<span>臀圍 ${deltaBadge(latest.hip, baseline.hip, 'cm')}</span>` : '',
+    latest.thigh && baseline.thigh ? `<span>大腿 ${deltaBadge(latest.thigh, baseline.thigh, 'cm')}</span>` : '',
+  ].filter(Boolean).join('');
+
   totalEl.innerHTML = `
     <p class="text-xs text-white/40 px-1 mb-2">🏁 總計（${baseline.date} → ${latest.date}）</p>
-    <div class="glass rounded-2xl p-4 flex flex-wrap gap-x-6 gap-y-1 justify-center text-sm">
-      <span>體重 ${deltaBadge(latest.weight, baseline.weight, 'kg')}</span>
-      <span>體脂 ${deltaBadge(latest.bodyFat, baseline.bodyFat, '%')}</span>
-      <span>內臟脂肪 ${deltaBadge(latest.visceralFat, baseline.visceralFat, '')}</span>
-      ${latest.chest && baseline.chest ? `<span>胸圍 ${deltaBadge(latest.chest, baseline.chest, 'cm')}</span>` : ''}
-      ${latest.arm && baseline.arm ? `<span>上手臂 ${deltaBadge(latest.arm, baseline.arm, 'cm')}</span>` : ''}
-      ${latest.waist && baseline.waist ? `<span>腰圍 ${deltaBadge(latest.waist, baseline.waist, 'cm')}</span>` : ''}
-      ${latest.hip && baseline.hip ? `<span>臀圍 ${deltaBadge(latest.hip, baseline.hip, 'cm')}</span>` : ''}
-      ${latest.thigh && baseline.thigh ? `<span>大腿 ${deltaBadge(latest.thigh, baseline.thigh, 'cm')}</span>` : ''}
+    <div class="glass rounded-2xl p-4 space-y-2 text-sm">
+      <div class="flex flex-wrap gap-x-6 gap-y-1 justify-center">
+        <span>體重 ${deltaBadge(latest.weight, baseline.weight, 'kg')}</span>
+        <span>體脂 ${deltaBadge(latest.bodyFat, baseline.bodyFat, '%')}</span>
+        <span>內臟脂肪 ${deltaBadge(latest.visceralFat, baseline.visceralFat, '')}</span>
+      </div>
+      ${measurementSpans ? `<div class="flex flex-wrap gap-x-6 gap-y-1 justify-center pt-2 border-t border-white/10">${measurementSpans}</div>` : ''}
     </div>`;
 
   const rows = [];
