@@ -9,8 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind is injected via Vite and style.css -->
-  <script type="module" crossorigin src="/fatloss-20260706/assets/index-C0ukfITk.js"></script>
-  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-C62a77qx.css">
+    <!-- Captures the auth redirect `type` (e.g. invite) from the URL hash before the
+         Supabase client (loaded later as a module script) reads and clears it. Must
+         stay a plain inline script so it runs first during HTML parsing. -->
+    <script>
+        window.__authRedirectType = new URLSearchParams(window.location.hash.slice(1)).get('type');
+    </script>
+  <script type="module" crossorigin src="/fatloss-20260706/assets/index-B9qdYe2-.js"></script>
+  <link rel="stylesheet" crossorigin href="/fatloss-20260706/assets/index-C6HNhsBT.css">
 </head>
 <body class="min-h-screen gradient-bg p-4 md:p-6 custom-scrollbar text-white">
     <!-- 漸層背景特效 -->
@@ -43,6 +49,7 @@
                 <input type="password" id="loginPassword" required placeholder="密碼" class="w-full glass rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all shadow-inner">
                 <button type="submit" class="w-full bg-white/90 hover:bg-white text-indigo-900 font-bold rounded-xl py-3 transition-all shadow-lg hover:shadow-xl cursor-pointer">登入</button>
             </form>
+            <button id="forgotPasswordBtn" type="button" class="text-sm text-white/60 hover:text-white/90 mt-4 underline cursor-pointer">忘記密碼？</button>
             <p id="loginMessage" class="text-sm text-rose-300 mt-4 hidden"></p>
         </div>
     </div>
